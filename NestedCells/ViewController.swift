@@ -14,8 +14,8 @@ class ViewController: UIViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		datasource.append(Human(name: "grandfather", children: [Human(name: "Ashok", children: [Human(name: "Rahul")])]))
-		datasource.append(Human(name: "grandfather1", children: [Human(name: "Ashok1", children: [Human(name: "Rahul1")])]))
+		datasource.append(Human(name: "Grandfather", children: [Human(name: "Son", children: [Human(name: "Kid")])]))
+		datasource.append(Human(name: "Grandfather 1", children: [Human(name: "Son 1", children: [Human(name: "Kid 1")])]))
 
 		getNestedObjects(from: datasource)
 		tableView.reloadData()
@@ -23,11 +23,12 @@ class ViewController: UIViewController {
 
 }
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
-	private func getNestedObjects(from array: [Human]) {
+	private func getNestedObjects(from array: [Human], padding: CGFloat = 20.0) {
 		for item in array {
+			item.padding = padding
 			allChild.append(item)
 			if item.children.isEmpty == false {
-				getNestedObjects(from: item.children)
+				getNestedObjects(from: item.children, padding: padding + 20.0)
 			}
 		}
 	}
@@ -47,7 +48,8 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! TableViewCell
-		cell.configure(title: allChild[indexPath.row].name)
+		let item = allChild[indexPath.row]
+		cell.configure(title: item.name, expanded: item.isExpanded, leading: item.padding, hideIcon: item.children.isEmpty)
 		return cell
 	}
 	
@@ -69,6 +71,7 @@ class Human {
 	
 	var name: String
 	var children: [Human] = []
+	var padding: CGFloat = 10.0
 	var isExpanded: Bool {
 		set {
 			if !children.isEmpty {
